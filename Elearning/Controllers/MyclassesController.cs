@@ -12,55 +12,55 @@ namespace Elearning.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TestsController : ControllerBase
+    public class MyclassesController : ControllerBase
     {
         private readonly ElearningContext _context;
 
-        public TestsController(ElearningContext context)
+        public MyclassesController(ElearningContext context)
         {
             _context = context;
         }
 
-        // GET: api/Tests
+        // GET: api/Myclasses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Test>>> GetTest()
+        public async Task<ActionResult<IEnumerable<Myclass>>> GetMyclass()
         {
-          if (_context.Test == null)
+          if (_context.Myclass == null)
           {
               return NotFound();
           }
-            return await _context.Test.ToListAsync();
+            return await _context.Myclass.ToListAsync();
         }
 
-        // GET: api/Tests/5
+        // GET: api/Myclasses/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Test>> GetTest(int id)
+        public async Task<ActionResult<Myclass>> GetMyclass(int id)
         {
-          if (_context.Test == null)
+          if (_context.Myclass == null)
           {
               return NotFound();
           }
-            var test = await _context.Test.FindAsync(id);
+            var myclass = await _context.Myclass.FindAsync(id);
 
-            if (test == null)
+            if (myclass == null)
             {
                 return NotFound();
             }
 
-            return test;
+            return myclass;
         }
 
-        // PUT: api/Tests/5
+        // PUT: api/Myclasses/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTest(int id, Test test)
+        public async Task<IActionResult> PutMyclass(int id, Myclass myclass)
         {
-            if (id != test.TestId)
+            if (id != myclass.MyclassId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(test).State = EntityState.Modified;
+            _context.Entry(myclass).State = EntityState.Modified;
 
             try
             {
@@ -68,7 +68,7 @@ namespace Elearning.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TestExists(id))
+                if (!MyclassExists(id))
                 {
                     return NotFound();
                 }
@@ -81,44 +81,44 @@ namespace Elearning.Controllers
             return NoContent();
         }
 
-        // POST: api/Tests
+        // POST: api/Myclasses
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Test>> PostTest(Test test)
+        public async Task<ActionResult<Myclass>> PostMyclass(Myclass myclass)
         {
-          if (_context.Test == null)
+          if (_context.Myclass == null)
           {
-              return Problem("Entity set 'ElearningContext.Test'  is null.");
+              return Problem("Entity set 'ElearningContext.Myclass'  is null.");
           }
-            _context.Test.Add(test);
+            _context.Myclass.Add(myclass);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTest", new { id = test.TestId }, test);
+            return CreatedAtAction("GetMyclass", new { id = myclass.MyclassId }, myclass);
         }
 
-        // DELETE: api/Tests/5
+        // DELETE: api/Myclasses/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTest(int id)
+        public async Task<IActionResult> DeleteMyclass(int id)
         {
-            if (_context.Test == null)
+            if (_context.Myclass == null)
             {
                 return NotFound();
             }
-            var test = await _context.Test.FindAsync(id);
-            if (test == null)
+            var myclass = await _context.Myclass.FindAsync(id);
+            if (myclass == null)
             {
                 return NotFound();
             }
 
-            _context.Test.Remove(test);
+            _context.Myclass.Remove(myclass);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TestExists(int id)
+        private bool MyclassExists(int id)
         {
-            return (_context.Test?.Any(e => e.TestId == id)).GetValueOrDefault();
+            return (_context.Myclass?.Any(e => e.MyclassId == id)).GetValueOrDefault();
         }
     }
 }

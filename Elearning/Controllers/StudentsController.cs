@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Elearning.Data;
 using Elearning.Models;
 
 namespace Elearning.Controllers
 {
-    public class StudentsController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class StudentsController : ControllerBase
     {
         private readonly ElearningContext _context;
 
@@ -19,145 +21,104 @@ namespace Elearning.Controllers
             _context = context;
         }
 
-        // GET: Students
-        public async Task<IActionResult> Index()
+        // GET: api/Students
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Student>>> GetStudent()
         {
-              return _context.Student != null ? 
-                          View(await _context.Student.ToListAsync()) :
-                          Problem("Entity set 'ElearningContext.Student'  is null.");
+          if (_context.Student == null)
+          {
+              return NotFound();
+          }
+            return await _context.Student.ToListAsync();
         }
 
-        // GET: Students/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/Students/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Student>> GetStudent(int id)
         {
-            if (id == null || _context.Student == null)
-            {
-                return NotFound();
-            }
-
-            var student = await _context.Student
-                .FirstOrDefaultAsync(m => m.StudentId == id);
-            if (student == null)
-            {
-                return NotFound();
-            }
-
-            return View(student);
-        }
-
-        // GET: Students/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Students/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("StudentId,username,password,Name,Gmail,Gender,Dateofbirth,Schoolyear")] Student student)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(student);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(student);
-        }
-
-        // GET: Students/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Student == null)
-            {
-                return NotFound();
-            }
-
+          if (_context.Student == null)
+          {
+              return NotFound();
+          }
             var student = await _context.Student.FindAsync(id);
+
             if (student == null)
             {
                 return NotFound();
             }
-            return View(student);
+
+            return student;
         }
 
-        // POST: Students/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("StudentId,username,password,Name,Gmail,Gender,Dateofbirth,Schoolyear")] Student student)
+        // PUT: api/Students/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutStudent(int id, Student student)
         {
             if (id != student.StudentId)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(student).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(student);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!StudentExists(student.StudentId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            return View(student);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!StudentExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: Students/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // POST: api/Students
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Student>> PostStudent(Student student)
         {
-            if (id == null || _context.Student == null)
+          if (_context.Student == null)
+          {
+              return Problem("Entity set 'ElearningContext.Student'  is null.");
+          }
+            _context.Student.Add(student);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetStudent", new { id = student.StudentId }, student);
+        }
+
+        // DELETE: api/Students/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStudent(int id)
+        {
+            if (_context.Student == null)
             {
                 return NotFound();
             }
-
-            var student = await _context.Student
-                .FirstOrDefaultAsync(m => m.StudentId == id);
+            var student = await _context.Student.FindAsync(id);
             if (student == null)
             {
                 return NotFound();
             }
 
-            return View(student);
-        }
-
-        // POST: Students/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Student == null)
-            {
-                return Problem("Entity set 'ElearningContext.Student'  is null.");
-            }
-            var student = await _context.Student.FindAsync(id);
-            if (student != null)
-            {
-                _context.Student.Remove(student);
-            }
-            
+            _context.Student.Remove(student);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NoContent();
         }
 
         private bool StudentExists(int id)
         {
-          return (_context.Student?.Any(e => e.StudentId == id)).GetValueOrDefault();
+            return (_context.Student?.Any(e => e.StudentId == id)).GetValueOrDefault();
         }
     }
 }
