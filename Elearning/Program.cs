@@ -1,12 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Elearning.Data;
+using Elearning.Services;
+using Elearning.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ElearningContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ElearningContext") ?? throw new InvalidOperationException("Connection string 'ElearningContext' not found.")));
 
 // Add services to the container.
-
+builder.Services.AddSingleton<IFormat, Format>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

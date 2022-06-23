@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Elearning.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace Elearning.Models
 {
-    public class Format
+    public interface Format : IFormat
     {
         [Key]
         public int FormatId { get; set; }
