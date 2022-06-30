@@ -9,7 +9,7 @@ builder.Services.AddDbContext<ElearningContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ElearningContext") ?? throw new InvalidOperationException("Connection string 'ElearningContext' not found.")));
 
 // Add services to the container.
-builder.Services.AddSingleton<IFormat, Format>();
+builder.Services.AddScoped<IFormat, sqlFormat>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

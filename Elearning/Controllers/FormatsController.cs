@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Elearning.Data;
 using Elearning.Models;
+using Elearning.Services;
 
 namespace Elearning.Controllers
 {
@@ -14,112 +15,166 @@ namespace Elearning.Controllers
     [ApiController]
     public class FormatsController : ControllerBase
     {
-        private readonly ElearningContext _context;
-
-        public FormatsController(ElearningContext context)
+        private IFormat _format;
+        public FormatsController(IFormat format)
         {
-            _context = context;
+            _format = format;
 
         }
-
-        // GET: api/Formats
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Format>>> GetFormat()
+        [Route("api/[controller]")]
+        public IActionResult getFormats()
         {
-          if (_context.Format == null)
-          {
-              return NotFound();
-          }
-            return await _context.Format.ToListAsync();
+            return Ok(_format.GetFormats());
         }
-
-        // GET: api/Formats/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Format>> GetFormat(int id)
+        [HttpGet]
+        [Route("api/[controller]/{id}")]
+        public IActionResult getFormat(int id)
         {
-          if (_context.Format == null)
-          {
-              return NotFound();
-          }
-            var format = await _context.Format.FindAsync(id);
-
-            if (format == null)
+            var format = _format.GetFormat(id);
+            if(format != null)
             {
-                return NotFound();
+                return Ok(format);
             }
-
-            return format;
+            return NotFound("loi");
         }
-
-        // PUT: api/Formats/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutFormat(int id, Format format)
-        {
-            if (id != format.FormatId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(format).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!FormatExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Formats
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Format>> PostFormat(Format format)
+        [Route("api/[controller]")]
+        public IActionResult GetFormat(Format format)
         {
-          if (_context.Format == null)
-          {
-              return Problem("Entity set 'ElearningContext.Format'  is null.");
-          }
-            _context.Format.Add(format);
-            await _context.SaveChangesAsync();
+            _format.AddFormat(format);
+            return Created(HttpContext.Request.Scheme + "://" + HttpContext.Request.Host + HttpContext.Request.Path + "/" + format.FormatId, format);
 
-            return CreatedAtAction("GetFormat", new { id = format.FormatId }, format);
         }
-
-        // DELETE: api/Formats/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFormat(int id)
+        [HttpDelete]
+        [Route("api/[controller]/{id}")]
+        public IActionResult DeleteFormat(int id)
         {
-            if (_context.Format == null)
+            var format = _format.GetFormat(id);
+            if(format != null)
             {
-                return NotFound();
+                _format.DeteleFormat(format);
             }
-            var format = await _context.Format.FindAsync(id);
-            if (format == null)
-            {
-                return NotFound();
-            }
-
-            _context.Format.Remove(format);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return NotFound("loi");
         }
-
-        private bool FormatExists(int id)
+        [HttpPut]
+        [Route("api/[controller]/{id}")]
+        public IActionResult EditFormat(int id, Format format)
         {
-            return (_context.Format?.Any(e => e.FormatId == id)).GetValueOrDefault();
+            var existingFormat = _format.GetFormat(id);
+            if(existingFormat != null)
+            {
+                format.FormatId = existingFormat.FormatId;
+                _format.EditFormat(format);
+            }
+            return Ok(format);
         }
+        //private readonly ElearningContext _context;
+
+        //public FormatsController(ElearningContext context)
+        //{
+        //    _context = context;
+
+        //}
+
+        //// GET: api/Formats
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<Format>>> GetFormat()
+        //{
+        //  if (_context.Format == null)
+        //  {
+        //      return NotFound();
+        //  }
+        //    return await _context.Format.ToListAsync();
+        //}
+
+        //// GET: api/Formats/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<Format>> GetFormat(int id)
+        //{
+        //  if (_context.Format == null)
+        //  {
+        //      return NotFound();
+        //  }
+        //    var format = await _context.Format.FindAsync(id);
+
+        //    if (format == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return format;
+        //}
+
+        //// PUT: api/Formats/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutFormat(int id, Format format)
+        //{
+        //    if (id != format.FormatId)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    _context.Entry(format).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!FormatExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
+
+        //// POST: api/Formats
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //public async Task<ActionResult<Format>> PostFormat(Format format)
+        //{
+        //  if (_context.Format == null)
+        //  {
+        //      return Problem("Entity set 'ElearningContext.Format'  is null.");
+        //  }
+        //    _context.Format.Add(format);
+        //    await _context.SaveChangesAsync();
+
+        //    return CreatedAtAction("GetFormat", new { id = format.FormatId }, format);
+        //}
+
+        //// DELETE: api/Formats/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteFormat(int id)
+        //{
+        //    if (_context.Format == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var format = await _context.Format.FindAsync(id);
+        //    if (format == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    _context.Format.Remove(format);
+        //    await _context.SaveChangesAsync();
+
+        //    return NoContent();
+        //}
+
+        //private bool FormatExists(int id)
+        //{
+        //    return (_context.Format?.Any(e => e.FormatId == id)).GetValueOrDefault();
+        //}
     }
 }

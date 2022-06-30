@@ -4,7 +4,12 @@ namespace Elearning.Services
 {
     public interface IFormat
     {
-        public int FormatId { get; set; }
-        public string Name { get; set; }
+        List<Format> GetFormats();
+        Format GetFormat(int id);
+        Format AddFormat(Format format);
+        void DeteleFormat(Format format);
+        Format EditFormat(Format format);
+
+
     }
 }
